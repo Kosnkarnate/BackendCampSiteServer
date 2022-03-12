@@ -7,8 +7,14 @@ const authenticate = require('../authenticate');
 const router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
+  //res.send('respond with a resource');
+  User.find()
+  .then(users => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json')
+      res.json(users);
+  })
 });
 
 router.post('/signup', (req, res) => {
@@ -18,7 +24,7 @@ router.post('/signup', (req, res) => {
         (err, user) => {
             if (err) {
                 res.statusCode = 500;
-                res.setHeader('COntent-Type', 'application/json');
+                res.setHeader('Content-Type', 'application/json');
                 res.json({err: err});
             } else {
                 if (req.body.firstname) {
